@@ -1,19 +1,45 @@
 package org.ithinktree.code.phylo.asr;
 
+import java.awt.Component;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.ParallelGroup;
+import javax.swing.GroupLayout.SequentialGroup;
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
+
 import dr.evolution.io.Importer.ImportException;
 import dr.evolution.io.NexusImporter;
 import dr.evolution.tree.NodeRef;
 import dr.evolution.tree.Tree;
+import dr.evolution.util.Taxon;
 
 public class AncestralSequenceRescue {
 
+	private static final String ASR = "Ancestral Sequence Rescue";
+	private static FileReader fr;
+	private static PrintStream os = System.out;
+	private static Tree t;
+	private static final Set<String> s = new HashSet<String>();
+	
 	/**
 	 * @param args
 	 * @throws ImportException 
@@ -21,92 +47,132 @@ public class AncestralSequenceRescue {
 	 */
 	public static void main(String[] args) throws IOException, ImportException {
 		
-		FileReader fr = new FileReader(args[0]);
-		NexusImporter importer = new NexusImporter(fr);
-		Tree tree = importer.importNextTree();
-		fr.close();
-		Set<String> set = new HashSet<String>();
-		for (int i = 1; i < args.length; i++) {
-			set.add(args[i]);
-		}
-		NodeRef n = getCommonAncestorNode(tree, set);
-		@SuppressWarnings("rawtypes")
-		Iterator i = tree.getNodeAttributeNames(n);
-		while (i.hasNext()) {
-			String a = (String) i.next();
-			Object o = tree.getNodeAttribute(n, a);
-			String s;
-			if (o.getClass().getName() == "[Ljava.lang.Object;") {
-				s = Arrays.toString((Object[]) o);
-			} else {
-				s = o.toString();
+		final JFrame f;
+		
+		if (args.length < 3) {
+			
+			f = new JFrame();
+			f.setTitle(ASR);
+			f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			GroupLayout gl = new GroupLayout(f.getContentPane());
+			f.getContentPane().setLayout(gl);
+			
+			final JList l = new JList();
+			l.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+			l.setLayoutOrientation(JList.VERTICAL);
+			JScrollPane sc = new JScrollPane(l);
+			
+			JPanel p = new JPanel();
+			JButton b = new JButton("Choose Annotated Tree File...");
+			final JTextField tf1 = new JTextField("no file selected", 16);
+			b.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent ae) {
+					JFileChooser fc = new JFileChooser();
+					if (fc.showOpenDialog(f) == JFileChooser.APPROVE_OPTION) {
+						try {
+							fr = new FileReader(fc.getSelectedFile());
+							t = new NexusImporter(fr).importNextTree();
+							fr.close();
+							l.setListData(t.asList().toArray());
+							l.repaint();
+						} catch (Exception e) {
+							JOptionPane.showMessageDialog(f, e.toString(), ASR, JOptionPane.ERROR_MESSAGE);
+							actionPerformed(ae);
+						}
+						tf1.setText(fc.getSelectedFile().getName());
+					}
+					
+				}
+			});
+			p.add(b);
+			p.add(tf1);
+			f.add(p);
+	
+			p = new JPanel();
+			b = new JButton("Choose Output Text File...");
+			final JTextField tf2 = new JTextField("no file selected", 16);
+			b.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent ae) {
+					JFileChooser fc = new JFileChooser();
+					if (fc.showSaveDialog(f) == JFileChooser.APPROVE_OPTION) {
+						try {
+							os = new PrintStream(new FileOutputStream(fc.getSelectedFile() + ".txt"));
+						} catch (FileNotFoundException e) {
+							JOptionPane.showMessageDialog(f, e.toString(), ASR, JOptionPane.ERROR_MESSAGE);
+							actionPerformed(ae);
+						}
+						tf2.setText(fc.getSelectedFile().getName());
+					}
+					
+				}
+			});
+			p.add(b);
+			p.add(tf2);
+			f.add(p);
+
+			f.add(sc);
+			
+			p = new JPanel();
+			b = new JButton("Cancel");
+			b.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent ae) {
+					System.exit(0);
+				}
+			});
+			p.add(b);
+			b = new JButton("Rescue Sequences");
+			b.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent ae) {
+					for (Object o : l.getSelectedValues()) {
+						s.add(((Taxon) o).getId());
+					}
+				}
+			});
+			p.add(b);
+			f.add(p);
+			
+			ParallelGroup pg = gl.createParallelGroup(GroupLayout.Alignment.CENTER);
+			SequentialGroup sg = gl.createSequentialGroup();
+			for (int i = 0; i < f.getComponentCount(); ++i) {
+				Component c = f.getComponent(i);
+				pg.addComponent(c);
+				sg.addComponent(c);
 			}
-			System.out.println(a + ": " + s);
+			gl.setHorizontalGroup(gl.createSequentialGroup().addGroup(pg));
+			gl.setVerticalGroup(sg);
+			
+			f.pack();
+			f.setVisible(true);
+						
+		} else {
+			fr = new FileReader(args[0]);
+			t = new NexusImporter(fr).importNextTree();
+			fr.close();
+			for (int i = 1; i < args.length; i++) s.add(args[i]);
+			rescueSequences();
 		}
+		
 	}
 	
-    /**
-     * Gets the most recent common ancestor (MRCA) node of a set of leaf nodes.
-     *
-     * @param tree      the Tree
-     * @param leafNodes a set of names
-     * @return the NodeRef of the MRCA
-     */
-	private static NodeRef getCommonAncestorNode(Tree tree, Set<String> leafNodes) {
-
-        int cardinality = leafNodes.size();
-
-        if (cardinality == 0) {
-            throw new IllegalArgumentException("No leaf nodes selected");
-        }
-
-        NodeRef[] mrca = {null};
-        getCommonAncestorNode(tree, tree.getRoot(), leafNodes, cardinality, mrca);
-
-        return mrca[0];
-    }
-
-    /*
-     * Private recursive function used by getCommonAncestorNode.
-     */
-    private static int getCommonAncestorNode(Tree tree, NodeRef node,
-                                             Set<String> leafNodes, int cardinality,
-                                             NodeRef[] mrca) {
-
-        if (tree.isExternal(node)) {
-
-            if (leafNodes.contains(tree.getTaxonId(node.getNumber()))) {
-                if (cardinality == 1) {
-                    mrca[0] = node;
-                }
-                return 1;
-            } else {
-                return 0;
-            }
-        }
-
-        int matches = 0;
-
-        for (int i = 0; i < tree.getChildCount(node); i++) {
-
-            NodeRef node1 = tree.getChild(node, i);
-
-            matches += getCommonAncestorNode(tree, node1, leafNodes, cardinality, mrca);
-
-            if (mrca[0] != null) {
-                break;
-            }
-        }
-
-        if (mrca[0] == null) {
-            // If we haven't already found the MRCA, test this node
-            if (matches == cardinality) {
-                mrca[0] = node;
-            }
-        }
-
-        return matches;
-    }
-
-
+	private static void rescueSequences() {
+		NodeRef n = Tree.Utils.getCommonAncestorNode(t, s);
+		@SuppressWarnings("rawtypes")
+		Iterator i = t.getNodeAttributeNames(n);
+		while (i.hasNext()) {
+			String a = (String) i.next();
+			Object o = t.getNodeAttribute(n, a);
+			String str;
+			if (o.getClass().getName() == "[Ljava.lang.Object;") {
+				str = Arrays.toString((Object[]) o);
+			} else {
+				str = o.toString();
+			}
+			os.println(a + ": " + str);
+		}
+		os.close();
+		System.exit(0);
+	}
+	
 }
