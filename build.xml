@@ -64,8 +64,7 @@
 
     <target name="optimize" depends="dist-all">
         <JarOpt src="${dist}/asr-temp.jar" dst="${dist}/asr.jar" 
-	        stripNonClassFiles="true"
-    	    printDependencies="true" >
+	        stripNonClassFiles="true" >
             <includePattern>org.ithinktree.code.phylo.asr.AncestralSequenceRescue</includePattern>
             <includePattern>dr.evoxml.TaxonParser</includePattern>
             <includePattern>dr.evoxml.TaxaParser</includePattern>
