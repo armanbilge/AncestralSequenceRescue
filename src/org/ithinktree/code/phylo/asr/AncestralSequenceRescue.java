@@ -60,13 +60,13 @@ public class AncestralSequenceRescue {
 			Component[] ca = new Component[4];
 			
 			final JList l = new JList();
-			l.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 			l.setLayoutOrientation(JList.VERTICAL);
 			JScrollPane sc = new JScrollPane(l);
 			
 			JPanel p = new JPanel();
 			JButton b = new JButton("Choose Annotated Tree File...");
 			final JTextField tf1 = new JTextField("no file selected", 16);
+			tf1.setEditable(false);
 			b.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent ae) {
 					JFileChooser fc = new JFileChooser();
@@ -93,6 +93,7 @@ public class AncestralSequenceRescue {
 			p = new JPanel();
 			b = new JButton("Choose Output Text File...");
 			final JTextField tf2 = new JTextField("no file selected", 16);
+			tf2.setEditable(false);
 			b.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent ae) {
 					JFileChooser fc = new JFileChooser();
@@ -115,7 +116,7 @@ public class AncestralSequenceRescue {
 			ca[2] = sc;
 			
 			p = new JPanel();
-			b = new JButton("Cancel");
+			b = new JButton("Quit");
 			b.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent ae) {
@@ -130,6 +131,8 @@ public class AncestralSequenceRescue {
 					for (Object o : l.getSelectedValues()) {
 						s.add(((Taxon) o).getId());
 					}
+					rescueSequences();
+					JOptionPane.showMessageDialog(f, "Rescue successful.", ASR, JOptionPane.INFORMATION_MESSAGE);
 				}
 			});
 			p.add(b);
@@ -154,6 +157,7 @@ public class AncestralSequenceRescue {
 			fr.close();
 			for (int i = 1; i < args.length; ++i) s.add(args[i]);
 			rescueSequences();
+			System.exit(0);
 		}
 		
 	}
@@ -174,7 +178,6 @@ public class AncestralSequenceRescue {
 			os.println(a + ": " + str);
 		}
 		os.close();
-		System.exit(0);
 	}
 	
 }
