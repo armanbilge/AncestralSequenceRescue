@@ -33,6 +33,7 @@
 
         <!-- Compile the java code from ${src} into ${build} /bin -->
         <javac source="${JDK_VERSION}" target="${JDK_VERSION}" srcdir="${src}" destdir="${build}" classpathref="classpath"
+               debug="true"
                fork="true"
                memoryinitialsize="256m"
                memorymaximumsize="1024m">
@@ -63,7 +64,7 @@
 
     <target name="optimize" depends="dist-all">
         <JarOpt src="${dist}/asr-temp.jar" dst="${dist}/asr.jar" 
-	        stripNonClassFiles="false" verbose="true" 
+	        stripNonClassFiles="true"
     	    printDependencies="true" >
             <includePattern>org.ithinktree.code.phylo.asr.AncestralSequenceRescue</includePattern>
             <includePattern>dr.evoxml.TaxonParser</includePattern>
