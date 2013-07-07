@@ -8,7 +8,7 @@
     <property name="lib" location="lib"/>
     <property name="dist" location="${build}/dist"/>
 
-    <property name="main_class_ASR" value="org.ithinktree.code.phylo.asr.AncestralSequenceRescue"/>
+    <property name="main_class" value="org.ithinktree.code.phylo.asr.AncestralSequenceRescue"/>
 
     <path id="classpath">
         <fileset dir="${lib}" includes="**/*.jar"/>
@@ -23,8 +23,7 @@
         <delete dir="${build}"/>
     </target>
 
-    <!-- clean previous build, compile Java source code, and Junit test, and make the beast.jar and beauti.jar -->
-    <target name="build" depends="clean,compile-all,dist-all"
+    <target name="build" depends="clean,compile-all,dist-all,optimize"
             description="Clean and Build all and distribute jar">
     </target>
 
@@ -39,23 +38,412 @@
                memorymaximumsize="1024m">
             <include name="org/ithinktree/code/phylo/ASR/AncestralSequenceRescue.java"/>
         </javac>
-        <echo message="Successfully complied."/>
+        <echo message="Successfully compiled."/>
     </target>
 
     <target name="dist-all" depends="compile-all">
         <!-- Create the distribution directory -->
         <mkdir dir="${dist}"/>
 
-        <jar jarfile="${dist}/asr.jar">
+        <jar jarfile="${dist}/asr-temp.jar">
             <manifest>
                 <attribute name="Built-By" value="${user.name}"/>
-                <attribute name="Main-Class" value="${main_class_BEAST}"/>
+                <attribute name="Main-Class" value="${main_class}"/>
             </manifest>
             <fileset dir="${build}">
                 <include name="org/ithinktree/code/phylo/ASR/AncestralSequenceRescue.class"/>
             </fileset>
             <zipgroupfileset dir="${lib}" includes="beast.jar"/>
         </jar>
+    </target>
+
+   <taskdef name="JarOpt" 
+	classname="org.cmc.jaroptimizer.JarOptTask" 
+	classpath="${lib}/jaropt.jar" />
+
+    <target name="optimize" depends="dist-all">
+        <JarOpt src="${dist}/asr-temp.jar" dst="${dist}/asr.jar" 
+	        stripNonClassFiles="false" verbose="true" 
+    	    printDependencies="true" >
+            <includePattern>org.ithinktree.code.phylo.ASR.AncestralSequenceRescue</includePattern>
+            <includePattern>dr.evoxml.TaxonParser</includePattern>
+            <includePattern>dr.evoxml.TaxaParser</includePattern>
+            <includePattern>dr.evoxml.AlignmentParser</includePattern>
+            <includePattern>dr.evoxml.SequenceParser</includePattern>
+            <includePattern>dr.evoxml.SitePatternsParser</includePattern>
+            <includePattern>dr.evoxml.PatternSubSetParser</includePattern>
+            <includePattern>dr.evoxml.AscertainedSitePatternsParser</includePattern>
+            <includePattern>dr.evoxml.ConvertAlignmentParser</includePattern>
+            <includePattern>dr.evoxml.MergePatternsParser</includePattern>
+            <includePattern>dr.evoxml.AttributePatternsParser</includePattern>
+            <includePattern>dr.evoxml.RandomTaxaSampleParser</includePattern>
+            <includePattern>dr.evoxml.ConstantPatternsParser</includePattern>
+            <includePattern>dr.evoxml.GeneralDataTypeParser</includePattern>
+            <includePattern>dr.evoxml.DateParser</includePattern>
+            <includePattern>dr.evoxml.LocationParser</includePattern>
+            <includePattern>dr.evoxml.HiddenNucleotideParser</includePattern>
+            <includePattern>dr.evoxml.MicrosatelliteParser</includePattern>
+            <includePattern>dr.evoxml.MicrosatellitePatternParser</includePattern>
+            <includePattern>dr.evoxml.MicrosatelliteSimulatorParser</includePattern>
+            <includePattern>dr.evoxml.KStateDataTypeParser</includePattern>
+            <includePattern>dr.evoxml.MutationDeathTypeParser</includePattern>
+            <includePattern>dr.evoxml.MetagenomeDataParser</includePattern>
+            <includePattern>dr.evomodelxml.substmodel.CovarionHKYParser</includePattern>
+            <includePattern>dr.evomodelxml.substmodel.CovarionGTRParser</includePattern>
+            <includePattern>dr.evomodelxml.substmodel.TwoStateCovarionModelParser</includePattern>
+            <includePattern>dr.evomodelxml.substmodel.BinaryCovarionModelParser</includePattern>
+            <includePattern>dr.evomodelxml.substmodel.BinarySubstitutionModelParser</includePattern>
+            <includePattern>dr.evomodelxml.substmodel.SubstitutionEpochModelParser</includePattern>
+            <includePattern>dr.evomodelxml.substmodel.TN93Parser</includePattern>
+            <includePattern>dr.evomodelxml.substmodel.FrequencyModelParser</includePattern>
+            <includePattern>dr.evomodelxml.substmodel.GeneralSubstitutionModelParser</includePattern>
+            <includePattern>dr.evomodelxml.substmodel.HKYParser</includePattern>
+            <includePattern>dr.evomodelxml.substmodel.GTRParser</includePattern>
+            <includePattern>dr.evomodelxml.substmodel.EmpiricalAminoAcidModelParser</includePattern>
+            <includePattern>dr.evomodelxml.substmodel.YangCodonModelParser</includePattern>
+            <includePattern>dr.evomodelxml.substmodel.AsymQuadModelParser</includePattern>
+            <includePattern>dr.evomodelxml.substmodel.LinearBiasModelParser</includePattern>
+            <includePattern>dr.evomodelxml.substmodel.TwoPhaseModelParser</includePattern>
+            <includePattern>dr.evomodelxml.substmodel.MsatBMAParser</includePattern>
+            <includePattern>dr.evomodelxml.substmodel.EmpiricalCodonModelParser</includePattern>
+            <includePattern>dr.evomodelxml.substmodel.PCACodonModelParser</includePattern>
+            <includePattern>dr.evomodelxml.substmodel.ComplexSubstitutionModelParser</includePattern>
+            <includePattern>dr.evomodelxml.substmodel.GLMSubstitutionModelParser</includePattern>
+            <includePattern>dr.inferencexml.model.MaskedParameterParser</includePattern>
+            <includePattern>dr.inferencexml.model.DuplicatedParameterParser</includePattern>
+            <includePattern>dr.evomodelxml.sitemodel.SampleStateModelParser</includePattern>
+            <includePattern>dr.evomodelxml.sitemodel.SampleStateAndCategoryModelParser</includePattern>
+            <includePattern>dr.evomodelxml.sitemodel.GammaSiteModelParser</includePattern>
+            <includePattern>dr.evomodelxml.sitemodel.CategorySiteModelParser</includePattern>
+            <includePattern>dr.evomodelxml.branchratemodel.ScaledTreeLengthRateModelParser</includePattern>
+            <includePattern>dr.evomodelxml.branchratemodel.ArbitraryBranchRatesParser</includePattern>
+            <includePattern>dr.evomodelxml.branchratemodel.DiscretizedBranchRatesParser</includePattern>
+            <includePattern>dr.evomodelxml.branchratemodel.LocalClockModelParser</includePattern>
+            <includePattern>dr.evomodelxml.branchratemodel.CompoundBranchRateModelParser</includePattern>
+            <includePattern>dr.evomodelxml.branchratemodel.ContinuousTraitBranchRateModelParser</includePattern>
+            <includePattern>dr.evomodelxml.branchratemodel.DiscreteTraitBranchRateModelParser</includePattern>
+            <includePattern>dr.evomodelxml.branchratemodel.RandomDiscretizedBranchRatesParser</includePattern>
+            <includePattern>dr.evomodelxml.branchratemodel.MixtureModelBranchRatesParser</includePattern>
+            <includePattern>dr.evomodelxml.branchratemodel.StrictClockBranchRatesParser</includePattern>
+            <includePattern>dr.evomodelxml.branchratemodel.RateEpochBranchRateModelParser</includePattern>
+            <includePattern>dr.evomodelxml.branchratemodel.RandomLocalClockModelParser</includePattern>
+            <includePattern>dr.evomodelxml.tree.RLTVLoggerOnTreeParser</includePattern>
+            <includePattern>dr.evomodelxml.clock.ACLikelihoodParser</includePattern>
+            <includePattern>dr.evomodelxml.clock.UCLikelihoodParser</includePattern>
+            <includePattern>dr.evomodelxml.coalescent.CataclysmicDemographicModelParser</includePattern>
+            <includePattern>dr.evomodelxml.coalescent.ExpConstExpDemographicModelParser</includePattern>
+            <includePattern>dr.evomodelxml.coalescent.ConstExpConstModelParser</includePattern>
+            <includePattern>dr.evomodelxml.coalescent.ExponentialLogisticModelParser</includePattern>
+            <includePattern>dr.evomodelxml.coalescent.PiecewisePopulationModelParser</includePattern>
+            <includePattern>dr.evomodelxml.coalescent.ScaledPiecewiseModelParser</includePattern>
+            <includePattern>dr.evomodelxml.coalescent.TwoEpochDemographicModelParser</includePattern>
+            <includePattern>dr.evomodelxml.coalescent.ExponentialSawtoothModelParser</includePattern>
+            <includePattern>dr.evomodelxml.coalescent.EmpiricalPiecewiseModelParser</includePattern>
+            <includePattern>dr.evomodelxml.coalescent.PopulationSizeGraphParser</includePattern>
+            <includePattern>dr.evomodelxml.coalescent.VariableSkylineLikelihoodParser</includePattern>
+            <includePattern>dr.evomodelxml.coalescent.VariableDemographicModelParser</includePattern>
+            <includePattern>dr.evomodelxml.coalescent.EBSPAnalysisParser</includePattern>
+            <includePattern>dr.evomodelxml.coalescent.CoalescentIntervalStatisticParser</includePattern>
+            <includePattern>dr.evomodelxml.coalescent.LineageCountStatisticParser</includePattern>
+            <includePattern>dr.evomodelxml.coalescent.BayesianSkylinePopSizeStatisticParser</includePattern>
+            <includePattern>dr.evomodelxml.coalescent.operators.BayesianSkylineGibbsOperatorParser</includePattern>
+            <includePattern>dr.evomodelxml.coalescent.operators.SampleNonActiveGibbsOperatorParser</includePattern>
+            <includePattern>dr.evomodelxml.coalescent.CoalescentSimulatorParser</includePattern>
+            <includePattern>dr.evomodelxml.coalescent.NewCoalescentSimulatorParser</includePattern>
+            <includePattern>dr.evomodelxml.coalescent.CoalescentLikelihoodParser</includePattern>
+            <includePattern>dr.evomodelxml.coalescent.BayesianSkylineLikelihoodParser</includePattern>
+            <includePattern>dr.evomodelxml.coalescent.ConstantPopulationModelParser</includePattern>
+            <includePattern>dr.evomodelxml.coalescent.ExponentialGrowthModelParser</includePattern>
+            <includePattern>dr.evomodelxml.coalescent.LogisticGrowthModelParser</includePattern>
+            <includePattern>dr.evomodelxml.coalescent.ConstantExponentialModelParser</includePattern>
+            <includePattern>dr.evomodelxml.coalescent.ConstantLogisticModelParser</includePattern>
+            <includePattern>dr.evomodelxml.coalescent.ExpansionModelParser</includePattern>
+            <includePattern>dr.evomodelxml.speciation.RandomLocalYuleModelParser</includePattern>
+            <includePattern>dr.evomodelxml.speciation.RLTVLoggerParser</includePattern>
+            <includePattern>dr.evomodelxml.speciation.BranchingLikelihoodParser</includePattern>
+            <includePattern>dr.evomodelxml.speciation.BetaSplittingModelParser</includePattern>
+            <includePattern>dr.evomodelxml.speciation.SpeciesTreeModelParser</includePattern>
+            <includePattern>dr.evomodelxml.speciation.SpeciesBindingsParser</includePattern>
+            <includePattern>dr.evomodelxml.speciation.SpeciesBindingsSPinfoParser</includePattern>
+            <includePattern>dr.evomodelxml.speciation.MultiSpeciesCoalescentParser</includePattern>
+            <includePattern>dr.evomodelxml.speciation.SpeciesTreeSimplePriorParser</includePattern>
+            <includePattern>dr.evomodelxml.speciation.SpeciesTreeBMPriorParser</includePattern>
+            <includePattern>dr.evomodelxml.speciation.AlloppMSCoalescentParser</includePattern>
+            <includePattern>dr.evomodelxml.speciation.AlloppNetworkPriorModelParser</includePattern>
+            <includePattern>dr.evomodelxml.speciation.AlloppNetworkPriorParser</includePattern>
+            <includePattern>dr.evomodelxml.speciation.AlloppSpeciesBindingsApSpInfoParser</includePattern>
+            <includePattern>dr.evomodelxml.speciation.AlloppSpeciesBindingsIndividualParser</includePattern>
+            <includePattern>dr.evomodelxml.speciation.AlloppSpeciesBindingsParser</includePattern>
+            <includePattern>dr.evomodelxml.speciation.AlloppSpeciesNetworkModelParser</includePattern>
+            <includePattern>dr.evomodelxml.speciation.MulMSCoalescentParser</includePattern>
+            <includePattern>dr.evomodelxml.speciation.MulSpeciesBindingsParser</includePattern>
+            <includePattern>dr.evomodelxml.speciation.MulSpeciesTreeModelParser</includePattern>
+            <includePattern>dr.evomodelxml.speciation.MulSpeciesTreePriorParser</includePattern>
+            <includePattern>dr.evomodelxml.speciation.YuleModelParser</includePattern>
+            <includePattern>dr.evomodelxml.speciation.BirthDeathModelParser</includePattern>
+            <includePattern>dr.evomodelxml.speciation.SpeciationLikelihoodParser</includePattern>
+            <includePattern>dr.evomodelxml.speciation.BirthDeathSerialSamplingModelParser</includePattern>
+            <includePattern>dr.evomodelxml.speciation.BirthDeathEpidemiologyModelParser</includePattern>
+            <includePattern>dr.evoxml.SimpleNodeParser</includePattern>
+            <includePattern>dr.evoxml.SimpleTreeParser</includePattern>
+            <includePattern>dr.evoxml.UPGMATreeParser</includePattern>
+            <includePattern>dr.evoxml.NeighborJoiningParser</includePattern>
+            <includePattern>dr.evoxml.NewickParser</includePattern>
+            <includePattern>dr.evoxml.DistanceMatrixParser</includePattern>
+            <includePattern>dr.evoxml.MultiLociDistanceParser</includePattern>
+            <includePattern>dr.evomodelxml.tree.TreeModelParser</includePattern>
+            <includePattern>dr.evomodelxml.tree.MicrosatelliteSamplerTreeModelParser</includePattern>
+            <includePattern>dr.evomodelxml.tree.TipHeightLikelihoodParser</includePattern>
+            <includePattern>dr.evomodelxml.tree.TreeMetricStatisticParser</includePattern>
+            <includePattern>dr.evomodelxml.tree.TreeLengthStatisticParser</includePattern>
+            <includePattern>dr.evomodelxml.tree.NodeHeightsStatisticParser</includePattern>
+            <includePattern>dr.evomodelxml.tree.TreeShapeStatisticParser</includePattern>
+            <includePattern>dr.evomodelxml.tree.TMRCAStatisticParser</includePattern>
+            <includePattern>dr.evomodelxml.tree.MRCATraitStatisticParser</includePattern>
+            <includePattern>dr.evomodelxml.tree.AncestralTraitParser</includePattern>
+            <includePattern>dr.evomodelxml.tree.ExternalLengthStatisticParser</includePattern>
+            <includePattern>dr.evomodelxml.tree.RateCovarianceStatisticParser</includePattern>
+            <includePattern>dr.evomodelxml.tree.RateStatisticParser</includePattern>
+            <includePattern>dr.evomodelxml.tree.MonophylyStatisticParser</includePattern>
+            <includePattern>dr.evomodelxml.tree.CompatibilityStatisticParser</includePattern>
+            <includePattern>dr.evomodelxml.tree.ParsimonyStatisticParser</includePattern>
+            <includePattern>dr.evomodelxml.tree.ParsimonyStateStatisticParser</includePattern>
+            <includePattern>dr.evomodelxml.tree.SpeciesTreeStatisticParser</includePattern>
+            <includePattern>dr.evomodelxml.tree.UniformNodeHeightPriorParser</includePattern>
+            <includePattern>dr.evomodelxml.EmpiricalTreeDistributionModelParser</includePattern>
+            <includePattern>dr.evomodelxml.EmpiricalTreeDistributionOperatorParser</includePattern>
+            <includePattern>dr.evomodelxml.tree.TreeHeightStatisticParser</includePattern>
+            <includePattern>dr.evomodelxml.tree.StarTreeModelParser</includePattern>
+            <includePattern>dr.evomodelxml.treelikelihood.TreeLikelihoodParser</includePattern>
+            <includePattern>dr.evomodelxml.treelikelihood.AncestralStateTreeLikelihoodParser</includePattern>
+            <includePattern>dr.evomodelxml.treelikelihood.MarkovJumpsTreeLikelihoodParser</includePattern>
+            <includePattern>dr.evomodelxml.treelikelihood.MicrosatelliteSamplerTreeLikelihoodParser</includePattern>
+            <includePattern>dr.evomodelxml.treelikelihood.SequenceErrorModelParser</includePattern>
+            <includePattern>dr.evoxml.HypermutantAlignmentParser</includePattern>
+            <includePattern>dr.evomodel.treelikelihood.HypermutantErrorModel</includePattern>
+            <includePattern>dr.evomodelxml.operators.SubtreeSlideOperatorParser</includePattern>
+            <includePattern>dr.evomodelxml.operators.ExchangeOperatorParser</includePattern>
+            <includePattern>dr.evomodelxml.operators.NNIParser</includePattern>
+            <includePattern>dr.evomodelxml.operators.FNPRParser</includePattern>
+            <includePattern>dr.evomodelxml.operators.WilsonBaldingParser</includePattern>
+            <includePattern>dr.evomodelxml.operators.ImportancePruneAndRegraftParser</includePattern>
+            <includePattern>dr.evomodelxml.operators.ImportanceSubtreeSwapParser</includePattern>
+            <includePattern>dr.evomodelxml.operators.GibbsSubtreeSwapParser</includePattern>
+            <includePattern>dr.evomodelxml.operators.GibbsPruneAndRegraftParser</includePattern>
+            <includePattern>dr.evomodelxml.operators.RateExchangeOperatorParser</includePattern>
+            <includePattern>dr.evomodelxml.operators.TreeBitMoveOperatorParser</includePattern>
+            <includePattern>dr.evomodelxml.operators.TreeBitRandomWalkOperatorParser</includePattern>
+            <includePattern>dr.evomodelxml.operators.TreeUniformParser</includePattern>
+            <includePattern>dr.evomodelxml.operators.ImportanceNarrowExchangeParser</includePattern>
+            <includePattern>dr.evomodelxml.operators.TreeNodeSlideParser</includePattern>
+            <includePattern>dr.evomodelxml.operators.AlloppNetworkNodeSlideParser</includePattern>
+            <includePattern>dr.evomodelxml.operators.AlloppSequenceReassignmentParser</includePattern>
+            <includePattern>dr.evomodelxml.operators.AlloppMoveLegsParser</includePattern>
+            <includePattern>dr.evomodelxml.operators.MulTreeNodeSlideParser</includePattern>
+            <includePattern>dr.evomodelxml.operators.MulTreeSequenceReassignmentParser</includePattern>
+            <includePattern>dr.evomodelxml.operators.RateScaleOperatorParser</includePattern>
+            <includePattern>dr.evomodelxml.operators.RateVarianceScaleOperatorParser</includePattern>
+            <includePattern>dr.evomodelxml.operators.RateSampleOperatorParser</includePattern>
+            <includePattern>dr.inferencexml.model.CompoundParameterParser</includePattern>
+            <includePattern>dr.inferencexml.model.CompoundLikelihoodParser</includePattern>
+            <includePattern>dr.inferencexml.model.BooleanLikelihoodParser</includePattern>
+            <includePattern>dr.inferencexml.model.DummyLikelihoodParser</includePattern>
+            <includePattern>dr.inferencexml.model.OneOnXPriorParser</includePattern>
+            <includePattern>dr.inferencexml.distribution.BinomialLikelihoodParser</includePattern>
+            <includePattern>dr.evomodelxml.coalescent.OrnsteinUhlenbeckPriorLikelihoodParser</includePattern>
+            <includePattern>dr.evomodelxml.coalescent.BMPriorLikelihoodParser</includePattern>
+            <includePattern>dr.math.distributions.MultivariatePolyaDistributionLikelihood</includePattern>
+            <includePattern>dr.inferencexml.distribution.DistributionLikelihoodParser</includePattern>
+            <includePattern>dr.inferencexml.distribution.MixedDistributionLikelihoodParser</includePattern>
+            <includePattern>dr.inferencexml.distribution.UniformDistributionModelParser</includePattern>
+            <includePattern>dr.inferencexml.distribution.NormalDistributionModelParser</includePattern>
+            <includePattern>dr.inferencexml.distribution.LogNormalDistributionModelParser</includePattern>
+            <includePattern>dr.inferencexml.distribution.InverseGaussianDistributionModelParser</includePattern>
+            <includePattern>dr.inferencexml.distribution.ExponentialMarkovModelParser</includePattern>
+            <includePattern>dr.inferencexml.distribution.ExponentialDistributionModelParser</includePattern>
+            <includePattern>dr.inferencexml.distribution.GammaDistributionModelParser</includePattern>
+            <includePattern>dr.inferencexml.distribution.OnePGammaDistributionModelParser</includePattern>
+            <includePattern>dr.inferencexml.distribution.DirichletProcessLikelihoodParser</includePattern>
+            <includePattern>dr.inferencexml.distribution.BetaDistributionModelParser</includePattern>
+            <includePattern>dr.inferencexml.distribution.PriorParsers</includePattern>
+            <includePattern>dr.inferencexml.distribution.ModelSpecificPseudoPriorLikelihoodParser</includePattern>
+            <includePattern>dr.inferencexml.distribution.TwoPartsDistributionLikelihoodParser</includePattern>
+            <includePattern>dr.inferencexml.model.MeanStatisticParser</includePattern>
+            <includePattern>dr.inferencexml.model.VarianceStatisticParser</includePattern>
+            <includePattern>dr.inferencexml.model.ProductStatisticParser</includePattern>
+            <includePattern>dr.inferencexml.model.SumStatisticParser</includePattern>
+            <includePattern>dr.inferencexml.model.DifferenceStatisticParser</includePattern>
+            <includePattern>dr.inferencexml.model.RatioStatisticParser</includePattern>
+            <includePattern>dr.inferencexml.model.ReciprocalStatisticParser</includePattern>
+            <includePattern>dr.inferencexml.model.NegativeStatisticParser</includePattern>
+            <includePattern>dr.inferencexml.model.ExponentialStatisticParser</includePattern>
+            <includePattern>dr.inferencexml.model.LogarithmStatisticParser</includePattern>
+            <includePattern>dr.inferencexml.model.ExpressionStatisticParser</includePattern>
+            <includePattern>dr.inferencexml.model.RPNcalculatorStatisticParser</includePattern>
+            <includePattern>dr.inferencexml.model.TestStatisticParser</includePattern>
+            <includePattern>dr.inferencexml.model.NotStatisticParser</includePattern>
+            <includePattern>dr.inferencexml.model.NotBooleanStatisticParser</includePattern>
+            <includePattern>dr.inferencexml.model.SubStatisticParser</includePattern>
+            <includePattern>dr.inferencexml.model.ThreadedCompoundLikelihoodParser</includePattern>
+            <includePattern>dr.inferencexml.operators.RandomWalkIntegerOperatorParser</includePattern>
+            <includePattern>dr.inferencexml.operators.RandomWalkOperatorParser</includePattern>
+            <includePattern>dr.inferencexml.operators.ScaleOperatorParser</includePattern>
+            <includePattern>dr.inferencexml.operators.LogRandomWalkOperatorParser</includePattern>
+            <includePattern>dr.inferencexml.operators.UniformOperatorParser</includePattern>
+            <includePattern>dr.inferencexml.operators.UniformIntegerOperatorParser</includePattern>
+            <includePattern>dr.inferencexml.operators.UpDownOperatorParser</includePattern>
+            <includePattern>dr.inferencexml.operators.MicrosatUpDownOperatorParser</includePattern>
+            <includePattern>dr.inferencexml.operators.SetOperatorParser</includePattern>
+            <includePattern>dr.inferencexml.operators.SwapOperatorParser</includePattern>
+            <includePattern>dr.inferencexml.operators.DeltaExchangeOperatorParser</includePattern>
+            <includePattern>dr.inferencexml.operators.DeltaMixOperatorParser</includePattern>
+            <includePattern>dr.inferencexml.operators.CenteredScaleOperatorParser</includePattern>
+            <includePattern>dr.inferencexml.operators.BitFlipOperatorParser</includePattern>
+            <includePattern>dr.inferencexml.operators.BitMoveOperatorParser</includePattern>
+            <includePattern>dr.inferencexml.operators.BitSwapOperatorParser</includePattern>
+            <includePattern>dr.inferencexml.operators.JointOperatorParser</includePattern>
+            <includePattern>dr.inferencexml.operators.TeamOperatorParser</includePattern>
+            <includePattern>dr.inferencexml.operators.SelectorOperatorParser</includePattern>
+            <includePattern>dr.inferencexml.operators.ValuesPoolSwapOperatorParser</includePattern>
+            <includePattern>dr.inferencexml.operators.DirtyLikelihoodOperatorParser</includePattern>
+            <includePattern>dr.inferencexml.operators.SimpleOperatorScheduleParser</includePattern>
+            <includePattern>dr.inferencexml.operators.MsatBitFlipOperatorParser</includePattern>
+            <includePattern>dr.inferencexml.operators.MicrosatelliteModelSelectOperatorParser</includePattern>
+            <includePattern>dr.inferencexml.operators.RandomWalkIntegerNodeHeightWeightedOperatorParser</includePattern>
+            <includePattern>dr.inferencexml.operators.RandomWalkIntegerSetSizeWeightedOperatorParser</includePattern>
+            <includePattern>dr.inferencexml.MCMCParser</includePattern>
+            <includePattern>dr.inferencexml.MLOptimizerParser</includePattern>
+            <includePattern>dr.inferencexml.loggers.LoggerParser</includePattern>
+            <includePattern>dr.inferencexml.loggers.MLLoggerParser</includePattern>
+            <includePattern>dr.inferencexml.loggers.ColumnsParser</includePattern>
+            <includePattern>dr.evomodelxml.tree.TreeLoggerParser</includePattern>
+            <includePattern>dr.evomodelxml.TreeTraceAnalysisParser</includePattern>
+            <includePattern>dr.evomodelxml.CSVExporterParser</includePattern>
+            <includePattern>dr.inferencexml.trace.TraceAnalysisParser</includePattern>
+            <includePattern>dr.inferencexml.trace.LogFileTraceExporterParser</includePattern>
+            <includePattern>dr.inferencexml.trace.MarginalLikelihoodAnalysisParser</includePattern>
+            <includePattern>dr.inferencexml.trace.HarmonicMeanAnalysisParser</includePattern>
+            <includePattern>dr.inferencexml.trace.AICMAnalysisParser</includePattern>
+            <includePattern>dr.inferencexml.trace.ArithmeticMeanAnalysisParser</includePattern>
+            <includePattern>dr.evomodelxml.coalescent.operators.GMRFSkyrideFixedEffectsGibbsOperatorParser</includePattern>
+            <includePattern>dr.evomodelxml.coalescent.operators.GMRFSkyrideBlockUpdateOperatorParser</includePattern>
+            <includePattern>dr.evomodelxml.coalescent.GMRFSkyrideLikelihoodParser</includePattern>
+            <includePattern>dr.evomodelxml.coalescent.GMRFIntervalHeightsStatisticParser</includePattern>
+            <includePattern>dr.evomodelxml.coalescent.GMRFTestLikelihoodParser</includePattern>
+            <includePattern>dr.evomodelxml.coalescent.GMRFPopSizeStatisticParser</includePattern>
+            <includePattern>dr.evomodelxml.coalescent.GMRFBivariateCurveAnalysisParser</includePattern>
+            <includePattern>dr.evomodelxml.substmodel.MkModelParser</includePattern>
+            <includePattern>dr.evomodelxml.substmodel.LewisMkSubstitutionModelParser</includePattern>
+            <includePattern>dr.evomodelxml.MSSD.ALSTreeLikelihoodParser</includePattern>
+            <includePattern>dr.evomodelxml.MSSD.ALSSiteModelParser</includePattern>
+            <includePattern>dr.evomodelxml.MSSD.SingleTipObservationProcessParser</includePattern>
+            <includePattern>dr.evomodelxml.MSSD.AnyTipObservationProcessParser</includePattern>
+            <includePattern>dr.evomodelxml.MSSD.ExponentialBranchLengthTreePriorParser</includePattern>
+            <includePattern>dr.evomodelxml.MSSD.CTMCScalePriorParser</includePattern>
+            <includePattern>dr.evomodelxml.substmodel.MutationDeathModelParser</includePattern>
+            <includePattern>dr.evomodelxml.indel.TKF91LikelihoodParser</includePattern>
+            <includePattern>dr.evomodelxml.indel.TKF91ModelParser</includePattern>
+            <includePattern>dr.evomodelxml.indel.IstvanOperatorParser</includePattern>
+            <includePattern>dr.inference.model.MatrixParameter</includePattern>
+            <includePattern>dr.inference.model.CorrelationStatistic</includePattern>
+            <includePattern>dr.inference.model.DesignMatrix</includePattern>
+            <includePattern>dr.inference.model.LoggableStatistic</includePattern>
+            <includePattern>dr.inference.distribution.MultivariateDistributionLikelihood</includePattern>
+            <includePattern>dr.inferencexml.distribution.GeneralizedLinearModelParser</includePattern>
+            <includePattern>dr.evomodel.operators.PrecisionMatrixGibbsOperator</includePattern>
+            <includePattern>dr.evomodel.operators.TraitGibbsOperator</includePattern>
+            <includePattern>dr.evomodel.operators.TraitRateGibbsOperator</includePattern>
+            <includePattern>dr.evomodel.operators.RandomWalkOnMapOperator</includePattern>
+            <includePattern>dr.evomodel.tree.NodeTraitLogger</includePattern>
+            <includePattern>dr.evomodel.operators.TipStateSwapOperator</includePattern>
+            <includePattern>dr.evomodel.operators.TipTraitSwapOperator</includePattern>
+            <includePattern>dr.evomodel.operators.DiscretizedLocationOperator</includePattern>
+            <includePattern>dr.evomodel.continuous.MultivariateDiffusionModel</includePattern>
+            <includePattern>dr.evomodel.continuous.MultivariateTDiffusionModel</includePattern>
+            <includePattern>dr.evomodel.continuous.AbstractMultivariateTraitLikelihood</includePattern>
+            <includePattern>dr.evomodel.continuous.InhibitionAssayLikelihood</includePattern>
+            <includePattern>dr.evomodel.continuous.GreatCircleDiffusionModel</includePattern>
+            <includePattern>dr.evomodel.continuous.CartogramDiffusionModel</includePattern>
+            <includePattern>dr.evomodel.continuous.MixtureCartogramDiffusionModel</includePattern>
+            <includePattern>dr.evomodel.continuous.BranchDirectionAttributeProvider</includePattern>
+            <includePattern>dr.evomodel.continuous.BranchMagnitudeAttributeProvider</includePattern>
+            <includePattern>dr.evomodel.continuous.DiffusionRateStatistic</includePattern>
+            <includePattern>dr.geo.KMLCoordinates</includePattern>
+            <includePattern>dr.geo.Polygon2D</includePattern>
+            <includePattern>dr.geo.GeoSpatialDistribution</includePattern>
+            <includePattern>dr.evomodel.continuous.plink.PlinkImporter</includePattern>
+            <includePattern>dr.inference.model.VectorSliceParameter</includePattern>
+            <includePattern>dr.inferencexml.operators.MVOUCovarianceOperatorParser</includePattern>
+            <includePattern>dr.inferencexml.distribution.RandomWalkModelParser</includePattern>
+            <includePattern>dr.inferencexml.model.DefaultModelParser</includePattern>
+            <includePattern>dr.inferencexml.model.DiagonalMatrixParser</includePattern>
+            <includePattern>dr.inferencexml.model.CompoundSymmetricMatrixParser</includePattern>
+            <includePattern>dr.evomodelxml.substmodel.MultivariateOUModelParser</includePattern>
+            <includePattern>dr.evomodelxml.substmodel.PositiveDefiniteSubstitutionModelParser</includePattern>
+            <includePattern>dr.evomodel.operators.BitFlipInSubstitutionModelOperator</includePattern>
+            <includePattern>dr.inference.operators.RateBitExchangeOperator</includePattern>
+            <includePattern>dr.inferencexml.distribution.CachedDistributionLikelihoodParser</includePattern>
+            <includePattern>dr.evomodel.ibd.IBDReporter</includePattern>
+            <includePattern>dr.evomodel.treelikelihood.NodePosteriorTreeLikelihood</includePattern>
+            <includePattern>dr.evomodel.ibd.AvgPosteriorIBDReporter</includePattern>
+            <includePattern>dr.app.seqgen.SequenceSimulator</includePattern>
+            <includePattern>dr.inference.model.MonotonicStatistic</includePattern>
+            <includePattern>dr.inference.model.MatrixInverseStatistic</includePattern>
+            <includePattern>dr.inference.operators.NormalNormalMeanGibbsOperator</includePattern>
+            <includePattern>dr.inference.operators.NormalGammaPrecisionGibbsOperator</includePattern>
+            <includePattern>dr.inference.operators.RegressionGibbsEffectOperator</includePattern>
+            <includePattern>dr.inference.operators.RegressionGibbsPrecisionOperator</includePattern>
+            <includePattern>dr.inference.operators.RegressionMetropolizedIndicatorOperator</includePattern>
+            <includePattern>dr.inference.model.WeightedMixtureModel</includePattern>
+            <includePattern>dr.inference.model.IntegratedMixtureModel</includePattern>
+            <includePattern>dr.inference.operators.MultivariateNormalOperator</includePattern>
+            <includePattern>dr.inferencexml.model.LikelihoodBenchmarkerParser</includePattern>
+            <includePattern>dr.inferencexml.distribution.EmpiricalDistributionLikelihoodParser</includePattern>
+            <includePattern>dr.evomodel.sitemodel.DirichletSiteModel</includePattern>
+            <includePattern>dr.evomodel.arg.coalescent.ARGCoalescentLikelihood</includePattern>
+            <includePattern>dr.evomodel.arg.coalescent.ARGUniformPrior</includePattern>
+            <includePattern>dr.evomodel.arg.likelihood.ARGLikelihood</includePattern>
+            <includePattern>dr.evomodel.arg.operators.SlidingPatternsOperator</includePattern>
+            <includePattern>dr.evomodel.arg.branchratemodel.ARGDiscretizedBranchRates</includePattern>
+            <includePattern>dr.evomodel.arg.ARGModel</includePattern>
+            <includePattern>dr.evomodel.arg.UniformPartitionLikelihood</includePattern>
+            <includePattern>dr.evomodel.arg.operators.ARGSubtreeSlideOperator</includePattern>
+            <includePattern>dr.evomodel.arg.operators.ARGExchangeOperator</includePattern>
+            <includePattern>dr.evomodel.arg.operators.ObsoleteARGAddRemoveEventOperator</includePattern>
+            <includePattern>dr.evomodel.arg.operators.ARGPartitioningOperator</includePattern>
+            <includePattern>dr.evomodel.arg.operators.ObsoleteARGNewEventOperator</includePattern>
+            <includePattern>dr.evomodel.arg.operators.ARGAddRemoveEventOperator</includePattern>
+            <includePattern>dr.evomodel.arg.operators.ARGSwapOperator</includePattern>
+            <includePattern>dr.evomodel.arg.ARGReassortmentNodeCountStatistic</includePattern>
+            <includePattern>dr.evomodel.arg.ARGTraceAnalysisParser</includePattern>
+            <includePattern>dr.evomodel.arg.ARGReassortmentTimingStatistic</includePattern>
+            <includePattern>dr.evomodel.arg.PoissonPartitionLikelihood</includePattern>
+            <includePattern>dr.evomodel.arg.RecombinationPartitionStatistic</includePattern>
+            <includePattern>dr.evomodel.arg.ARGTotalLengthStatistic</includePattern>
+            <includePattern>dr.evomodel.arg.ARGDistinctTreeCountStatistic</includePattern>
+            <includePattern>dr.evomodel.arg.HierarchicalPartitionLikelihood</includePattern>
+            <includePattern>dr.evomodel.arg.ARGRelaxedClock</includePattern>
+            <includePattern>dr.evomodel.arg.ARGRatePrior</includePattern>
+            <includePattern>dr.evomodel.arg.ARGTreeLogger</includePattern>
+            <includePattern>dr.evomodel.arg.ARGLogger</includePattern>
+            <includePattern>dr.evomodelxml.tree.HiddenLinkageModelParser</includePattern>
+            <includePattern>dr.evomodelxml.tree.HiddenLinkageLoggerParser</includePattern>
+            <includePattern>dr.evomodelxml.operators.MoveLinkageGroupParser</includePattern>
+            <includePattern>dr.evomodelxml.tree.HiddenLinkageTreeLoggerParser</includePattern>
+            <includePattern>dr.evomodelxml.treelikelihood.HiddenLinkageLikelihoodParser</includePattern>
+            <includePattern>dr.evoxml.LinkageConstraintsParser</includePattern>
+            <includePattern>dr.evoxml.LinkedGroupParser</includePattern>
+            <includePattern>dr.evomodel.operators.LinkageGroupSwap</includePattern>
+            <includePattern>dr.inference.trace.DnDsPerSiteAnalysis</includePattern>
+            <includePattern>dr.inference.trace.CnCsPerSiteAnalysis</includePattern>
+            <includePattern>dr.inference.trace.OldDnDsPerSiteAnalysis</includePattern>
+            <includePattern>dr.inference.mcmc.MarginalLikelihoodEstimator</includePattern>
+            <includePattern>dr.inference.model.PathLikelihood</includePattern>
+            <includePattern>dr.inference.trace.PathSamplingAnalysis</includePattern>
+            <includePattern>dr.inference.trace.SteppingStoneSamplingAnalysis</includePattern>
+            <includePattern>dr.evomodel.continuous.LatentLiabilityLikelihood</includePattern>
+            <includePattern>dr.evomodel.operators.LatentLiabilityGibbsOperato</includePattern>
+        </JarOpt>
     </target>
 
 </project>
