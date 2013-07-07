@@ -19,12 +19,12 @@ import javax.swing.GroupLayout.SequentialGroup;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
-import javax.swing.ListSelectionModel;
 
 import dr.evolution.io.Importer.ImportException;
 import dr.evolution.io.NexusImporter;
@@ -49,7 +49,7 @@ public class AncestralSequenceRescue {
 		
 		final JFrame f;
 		
-		if (args.length < 3) {
+		if (args.length < 2) {
 			
 			f = new JFrame();
 			f.setTitle(ASR);
@@ -57,7 +57,7 @@ public class AncestralSequenceRescue {
 			GroupLayout gl = new GroupLayout(f.getContentPane());
 			f.getContentPane().setLayout(gl);
 			
-			Component[] ca = new Component[4];
+			Component[] ca = new Component[5];
 			
 			final JList l = new JList();
 			l.setLayoutOrientation(JList.VERTICAL);
@@ -113,7 +113,9 @@ public class AncestralSequenceRescue {
 			p.add(tf2);
 			ca[1] = p;
 
-			ca[2] = sc;
+			ca[2] = new JLabel("Select taxa whose MRCA to rescue.");
+
+			ca[3] = sc;
 			
 			p = new JPanel();
 			b = new JButton("Quit");
@@ -136,7 +138,7 @@ public class AncestralSequenceRescue {
 				}
 			});
 			p.add(b);
-			ca[3] = p;
+			ca[4] = p;
 			
 			ParallelGroup pg = gl.createParallelGroup(GroupLayout.Alignment.CENTER);
 			SequentialGroup sg = gl.createSequentialGroup();
