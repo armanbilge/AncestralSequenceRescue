@@ -57,6 +57,8 @@ public class AncestralSequenceRescue {
 			GroupLayout gl = new GroupLayout(f.getContentPane());
 			f.getContentPane().setLayout(gl);
 			
+			Component[] ca = new Component[4];
+			
 			final JList l = new JList();
 			l.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 			l.setLayoutOrientation(JList.VERTICAL);
@@ -86,7 +88,7 @@ public class AncestralSequenceRescue {
 			});
 			p.add(b);
 			p.add(tf1);
-			f.add(p);
+			ca[0] = p;
 	
 			p = new JPanel();
 			b = new JButton("Choose Output Text File...");
@@ -108,9 +110,9 @@ public class AncestralSequenceRescue {
 			});
 			p.add(b);
 			p.add(tf2);
-			f.add(p);
+			ca[1] = p;
 
-			f.add(sc);
+			ca[2] = sc;
 			
 			p = new JPanel();
 			b = new JButton("Cancel");
@@ -131,12 +133,12 @@ public class AncestralSequenceRescue {
 				}
 			});
 			p.add(b);
-			f.add(p);
+			ca[3] = p;
 			
 			ParallelGroup pg = gl.createParallelGroup(GroupLayout.Alignment.CENTER);
 			SequentialGroup sg = gl.createSequentialGroup();
-			for (int i = 0; i < f.getComponentCount(); ++i) {
-				Component c = f.getComponent(i);
+			for (int i = 0; i < ca.length; ++i) {
+				Component c = ca[i];
 				pg.addComponent(c);
 				sg.addComponent(c);
 			}
@@ -150,7 +152,7 @@ public class AncestralSequenceRescue {
 			fr = new FileReader(args[0]);
 			t = new NexusImporter(fr).importNextTree();
 			fr.close();
-			for (int i = 1; i < args.length; i++) s.add(args[i]);
+			for (int i = 1; i < args.length; ++i) s.add(args[i]);
 			rescueSequences();
 		}
 		
