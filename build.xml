@@ -36,7 +36,7 @@
                fork="true"
                memoryinitialsize="256m"
                memorymaximumsize="1024m">
-            <include name="org/ithinktree/code/phylo/ASR/AncestralSequenceRescue.java"/>
+            <include name="org/ithinktree/code/phylo/asr/AncestralSequenceRescue.java"/>
         </javac>
         <echo message="Successfully compiled."/>
     </target>
@@ -51,7 +51,7 @@
                 <attribute name="Main-Class" value="${main_class}"/>
             </manifest>
             <fileset dir="${build}">
-                <include name="org/ithinktree/code/phylo/ASR/AncestralSequenceRescue.class"/>
+                <include name="org/ithinktree/code/phylo/asr/**"/>
             </fileset>
             <zipgroupfileset dir="${lib}" includes="beast.jar"/>
         </jar>
@@ -65,7 +65,7 @@
         <JarOpt src="${dist}/asr-temp.jar" dst="${dist}/asr.jar" 
 	        stripNonClassFiles="false" verbose="true" 
     	    printDependencies="true" >
-            <includePattern>org.ithinktree.code.phylo.ASR.AncestralSequenceRescue</includePattern>
+            <includePattern>org.ithinktree.code.phylo.asr.AncestralSequenceRescue</includePattern>
             <includePattern>dr.evoxml.TaxonParser</includePattern>
             <includePattern>dr.evoxml.TaxaParser</includePattern>
             <includePattern>dr.evoxml.AlignmentParser</includePattern>
@@ -444,6 +444,7 @@
             <includePattern>dr.evomodel.continuous.LatentLiabilityLikelihood</includePattern>
             <includePattern>dr.evomodel.operators.LatentLiabilityGibbsOperato</includePattern>
         </JarOpt>
+        <delete file="${dist}/asr-temp.jar"/>
     </target>
 
 </project>
