@@ -9,6 +9,7 @@ Alternatively, specify the tree file and at least two taxa whose MRCA's node att
 `java -Xms512 -Xmx2G -jar asr.jar [tree file] [taxon1] [taxon2] ...`
 
 [**DOWNLOAD**](http://github.com/armanbilge/AncestralSequenceRescue/releases)
+
 [![Build Status](https://travis-ci.org/armanbilge/AncestralSequenceRescue.png?branch=master)](https://travis-ci.org/armanbilge/AncestralSequenceRescue)
 
 ![ASR Screenshot](asr.png)
