@@ -10,6 +10,6 @@ Alternatively, specify the tree file and at least two taxa whose MRCA's node att
 
 [**DOWNLOAD**](http://github.com/armanbilge/AncestralSequenceRescue/releases)
 
-[![Build Status](https://travis-ci.org/armanbilge/AncestralSequenceRescue.png?branch=master)](https://travis-ci.org/armanbilge/AncestralSequenceRescue)
+[![Build Status](https://travis-ci.org/armanbilge/AncestralSequenceRescue.svg?branch=master)](https://travis-ci.org/armanbilge/AncestralSequenceRescue)
 
 ![ASR Screenshot](asr.png)
